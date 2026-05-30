@@ -26,14 +26,17 @@ services:
       DB_PASSWORD: airflow
       DB_NAME: airflow
     user: "50000:0"
-    command: >
-      bash -c "
-      until pg_isready -h airflow-postgres -p 5432 -U airflow; do
-        echo 'Waiting for airflow-postgres to be ready...'
-        sleep 2
-      done &&
-      airflow db migrate &&
-      airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin"
+    command:
+      - bash
+      - -c
+      - |
+        until pg_isready -h airflow-postgres -p 5432 -U airflow; do
+          echo 'Waiting for airflow-postgres to be ready...'
+          sleep 2
+        done &&
+        python -c "import psycopg2; conn = psycopg2.connect(host='airflow-postgres', user='airflow', password='airflow', dbname='airflow'); cur = conn.cursor(); cur.execute('CREATE TABLE IF NOT EXISTS raw_sales (user_id integer, event varchar(50), amount integer); CREATE TABLE IF NOT EXISTS raw_profit_events (product_id integer, product_name varchar(100), category varchar(50), year integer, quantity integer, revenue decimal(10, 2), cost decimal(10, 2), profit decimal(10, 2), profit_margin decimal(5, 2));'); conn.commit(); conn.close()" &&
+        airflow db migrate &&
+        (airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin || true)
 
   airflow-webserver:
     build: .

@@ -60,7 +60,7 @@ def main() -> None:
     consumer = KafkaConsumer(
         "sales_topic",
         "profit_events",
-        bootstrap_servers="kafka:9092",
+        bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
         auto_offset_reset="earliest",
         enable_auto_commit=True,
         group_id="sales-profit-postgres-consumer",
