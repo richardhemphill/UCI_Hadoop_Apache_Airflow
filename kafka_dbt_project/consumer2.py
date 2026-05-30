@@ -1,6 +1,7 @@
 """Read sales events and profit data from Kafka and insert them into PostgreSQL."""
 
 import json
+import os
 
 import psycopg2
 from kafka import KafkaConsumer
@@ -41,11 +42,11 @@ values (%s, %s, %s, %s, %s, %s, %s, %s, %s);
 
 def main() -> None:
     connection = psycopg2.connect(
-        host="localhost",
-        port=5432,
-        database="analytics",
-        user="postgres",
-        password="postgres",
+        host=os.getenv("DB_HOST", "127.0.0.1"),
+        port=int(os.getenv("DB_PORT", 5432)),
+        database=os.getenv("DB_NAME", "airflow"),
+        user=os.getenv("DB_USER", "airflow"),
+        password=os.getenv("DB_PASSWORD", "airflow"),
     )
     cursor = connection.cursor()
     
@@ -59,7 +60,7 @@ def main() -> None:
     consumer = KafkaConsumer(
         "sales_topic",
         "profit_events",
-        bootstrap_servers="localhost:9092",
+        bootstrap_servers="kafka:9092",
         auto_offset_reset="earliest",
         enable_auto_commit=True,
         group_id="sales-profit-postgres-consumer",

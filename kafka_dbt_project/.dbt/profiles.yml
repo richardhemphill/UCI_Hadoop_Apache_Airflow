@@ -3,10 +3,10 @@ default:
   outputs:
     dev:
       type: postgres
-      host: localhost
-      user: postgres
-      password: postgres
+      host: airflow-postgres
+      user: airflow
+      password: airflow
       port: 5432
-      dbname: analytics
+      dbname: airflow
       schema: public
       threads: 1
