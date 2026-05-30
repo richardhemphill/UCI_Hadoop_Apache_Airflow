@@ -30,8 +30,8 @@ Important: do not keep an empty `kafka_dbt_project` folder inside `airflow_docke
 
 Docker commands are run from:
 
-```bash
-cd ~/projects/UCI_Hadoop_Apache_Airflow/airflow_docker_compose_kafka_dbt
+```powershell
+cd $HOME/git/UCI_Hadoop_Apache_Airflow/airflow_docker_compose_kafka_dbt
 ```
 
 The dbt project is one folder above, so the volume mapping is:
@@ -48,9 +48,9 @@ Inside the Airflow container, dbt sees the project at:
 
 ## Start Airflow
 
-```bash
-cd ~/projects/UCI_Hadoop_Apache_Airflow/airflow_docker_compose_kafka_dbt
-echo "AIRFLOW_UID=$(id -u)" > .env
+```powershell
+cd $HOME/git/UCI_Hadoop_Apache_Airflow/airflow_docker_compose_kafka_dbt
+"AIRFLOW_UID=50000" | Out-File -Encoding ascii .env
 docker compose build --no-cache
 docker compose up -d
 ```

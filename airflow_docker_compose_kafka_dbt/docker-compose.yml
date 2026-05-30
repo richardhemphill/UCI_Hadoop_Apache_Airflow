@@ -8,28 +8,51 @@ services:
     ports:
       - "5432:5432"
 
-  airflow-webserver:
+  airflow-init:
     build: .
     depends_on:
       - airflow-postgres
     environment:
       AIRFLOW__CORE__EXECUTOR: SequentialExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'airflow_secret_key_for_synchronization'
+    user: "50000:0"
+    command: >
+      bash -c "airflow db migrate &&
+      airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin"
+
+  airflow-webserver:
+    build: .
+    depends_on:
+      airflow-postgres:
+        condition: service_started
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'airflow_secret_key_for_synchronization'
     volumes:
       - ./dags:/opt/airflow/dags
       - ../kafka_dbt_project:/opt/airflow/kafka_dbt_project
     ports:
       - "8081:8080"
+    user: "50000:0"
     command: webserver
 
   airflow-scheduler:
     build: .
     depends_on:
-      - airflow-postgres
+      airflow-postgres:
+        condition: service_started
+      airflow-init:
+        condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: SequentialExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'airflow_secret_key_for_synchronization'
     volumes:
       - ./dags:/opt/airflow/dags
       - ../kafka_dbt_project:/opt/airflow/kafka_dbt_project
+    user: "50000:0"
     command: scheduler
