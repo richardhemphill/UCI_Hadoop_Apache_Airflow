@@ -86,10 +86,7 @@ Password: admin
 
 ## Test dbt inside the Airflow container
 
-> **Note:** If using WSL (Windows Subsystem for Linux), add read/write permissions with following:
->  ```bash
->  chmod -R o+rw ~/projects/UCI_Hadoop_Apache_Airflow/
-> ````
+> **Note:** If using Linux, add read/write permissions with `chmod -R o+rw ~/projects/UCI_Hadoop_Apache_Airflow/`
 
 ```bash
 docker exec -it airflow_docker_compose_kafka_dbt-airflow-webserver-1 bash
@@ -98,6 +95,7 @@ dbt debug --profiles-dir .dbt
 dbt run --profiles-dir .dbt
 dbt test --profiles-dir .dbt
 ```
+> **Note:** Upon finishing the test inside the container, use `exit` to depart from it.
 
 ## Trigger the DAG
 
