@@ -86,6 +86,11 @@ Password: admin
 
 ## Test dbt inside the Airflow container
 
+> **Note:** If using WSL (Windows Subsystem for Linux), add read/write permissions with following:
+>  ```bash
+>  chmod -R o+rw ~/projects/UCI_Hadoop_Apache_Airflow/
+> ````
+
 ```bash
 docker exec -it airflow_docker_compose_kafka_dbt-airflow-webserver-1 bash
 cd /opt/airflow/kafka_dbt_project
